@@ -1,0 +1,30 @@
+---
+# tasks file for install_default
+- name: Check and Print Linux version
+  debug: var=ansible_os_family
+
+- block:    #=========Block fo REDHAT============
+
+     - name: Install Apache Web Server
+       yum: name=httpd state=latest
+
+     - name: Start Web service for redhat
+       service: name=httpd state=started enabled=yes
+  when: ansible_os_family == "RedHat"
+
+
+- name: Generate INDEX.HTML file
+  template: src=index.j2 dest={{ destin_folder }}/index.html mode=0555
+  notify:
+    - Restart Apache RedHat
+
+
+- name: Copy MyHomePage to Servers
+  copy: src={{ item }}  dest={{ destin_folder }} mode=0555
+  loop:
+     - "snow1.png"
+     - "snow2.png"
+     - "snow3.png"
+  notify:
+     -  Restart Apache RedHat
+
